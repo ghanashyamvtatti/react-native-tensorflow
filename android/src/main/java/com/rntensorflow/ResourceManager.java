@@ -27,14 +27,27 @@ public class ResourceManager {
         if(URLUtil.isValidUrl(resource)) {
             return loadFromUrl(resource);
         } else {
-            return loadFromLocal(resource);
+            return loadFromLocal(resource, isResourceFile(resource));
         }
     }
 
-    private byte[] loadFromLocal(String resource) {
+
+    private boolean isResourceFile(String resource) {
+        if(resource.startsWith("file://")) {
+            return true;
+        }
+        return false;
+    }
+
+    private byte[] loadFromLocal(String resource, Boolean isFile) {
         try {
-            int identifier = reactContext.getResources().getIdentifier(resource, "drawable", reactContext.getPackageName());
-            InputStream inputStream = reactContext.getResources().openRawResource(identifier);
+            InputStream inputStream;
+            if(isFile) {
+                inputStream = new FileInputStream(resource.replace("file://", ""));
+            } else {
+                int identifier = reactContext.getResources().getIdentifier(resource, "drawable", reactContext.getPackageName());
+                inputStream = reactContext.getResources().openRawResource(identifier);
+            }
             return inputStreamToByteArray(inputStream);
         } catch (IOException | Resources.NotFoundException e) {
             try {
