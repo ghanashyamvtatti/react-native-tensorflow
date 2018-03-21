@@ -24,10 +24,11 @@ public class ResourceManager {
     }
 
     public byte[] loadResource(String resource) {
-        if(URLUtil.isValidUrl(resource)) {
+        boolean isLocalFile = isResourceFile(resource);
+        if(!isLocalFile && URLUtil.isValidUrl(resource)) {
             return loadFromUrl(resource);
         } else {
-            return loadFromLocal(resource, isResourceFile(resource));
+            return loadFromLocal(resource, isLocalFile);
         }
     }
 
