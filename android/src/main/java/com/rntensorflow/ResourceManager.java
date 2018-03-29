@@ -2,8 +2,10 @@ package com.rntensorflow;
 
 import android.content.res.Resources;
 import android.webkit.URLUtil;
+
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.modules.network.OkHttpClientProvider;
+
 import okhttp3.Request;
 import okhttp3.Response;
 
@@ -25,7 +27,7 @@ public class ResourceManager {
 
     public byte[] loadResource(String resource) {
         boolean isLocalFile = isResourceFile(resource);
-        if(!isLocalFile && URLUtil.isValidUrl(resource)) {
+        if (!isLocalFile && URLUtil.isValidUrl(resource)) {
             return loadFromUrl(resource);
         } else {
             return loadFromLocal(resource, isLocalFile);
@@ -34,7 +36,7 @@ public class ResourceManager {
 
 
     private boolean isResourceFile(String resource) {
-        if(resource.startsWith("file://")) {
+        if (resource.startsWith("file://") || resource.startsWith("content:/")) {
             return true;
         }
         return false;
@@ -43,8 +45,8 @@ public class ResourceManager {
     private byte[] loadFromLocal(String resource, Boolean isFile) {
         try {
             InputStream inputStream;
-            if(isFile) {
-                inputStream = new FileInputStream(resource.replace("file://", ""));
+            if (isFile) {
+                inputStream = new FileInputStream(resource.replace("file://", "").replace("content:/", ""));
             } else {
                 int identifier = reactContext.getResources().getIdentifier(resource, "drawable", reactContext.getPackageName());
                 inputStream = reactContext.getResources().openRawResource(identifier);
