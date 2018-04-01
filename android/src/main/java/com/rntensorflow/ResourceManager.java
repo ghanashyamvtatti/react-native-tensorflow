@@ -1,6 +1,10 @@
 package com.rntensorflow;
 
+import android.content.Context;
 import android.content.res.Resources;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.webkit.URLUtil;
 
 import com.facebook.react.bridge.ReactContext;
@@ -12,6 +16,7 @@ import okhttp3.Response;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 
 public class ResourceManager {
 
@@ -42,11 +47,31 @@ public class ResourceManager {
         return false;
     }
 
+
+    public String getRealPathFromURI(Uri contentUri) {
+        Cursor cursor = null;
+        try {
+            String[] proj = {MediaStore.Images.Media.DATA};
+            cursor = reactContext.getContentResolver().query(contentUri, proj, null, null, null);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+
     private byte[] loadFromLocal(String resource, Boolean isFile) {
         try {
             InputStream inputStream;
             if (isFile) {
-                inputStream = new FileInputStream(resource.replace("file://", "").replace("content:/", ""));
+                if (resource.startsWith("content:/")) {
+                    resource = getRealPathFromURI(Uri.parse(resource));
+                }
+                inputStream = new FileInputStream(resource.replace("file://", ""));
             } else {
                 int identifier = reactContext.getResources().getIdentifier(resource, "drawable", reactContext.getPackageName());
                 inputStream = reactContext.getResources().openRawResource(identifier);

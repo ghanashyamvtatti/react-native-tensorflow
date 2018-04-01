@@ -1,7 +1,7 @@
 {
   "name": "@thoughtclan/react-native-tensorflow",
   "registry": "http://r2d2:4873",
-  "version": "0.1.6-test4",
+  "version": "0.1.6-test6",
   "description": "A TensorFlow inference library for react native",
   "main": "index.js",
   "author": "reweber",
